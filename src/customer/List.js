@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {
   Table,
@@ -15,7 +16,16 @@ import {
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PersonIcon from '@mui/icons-material/Person';
 
-import { getFullName } from './helper';
+import { getFullName } from '../service/helper';
+
+List.propTypes = {
+  title: PropTypes.string,
+  data: PropTypes.arrayOf(
+    PropTypes.object
+  ),
+  loading: PropTypes.bool,
+  handleClick: PropTypes.func
+}
 
 export default function List(props) {
   const { title, data, loading, handleClick } = props;

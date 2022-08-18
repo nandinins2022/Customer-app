@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import List from './List';
 import Transaction from './Transaction';
@@ -8,12 +8,13 @@ import {
 	Grid
 } from '@mui/material';
 
-import { getRewards } from './helper';
-import { CustomersList, TransactionList, Months } from './dummy'
+import { CustomersList } from '../service/dummy'
+import { getCustomerTransaction } from '../service/TransactionService';
 
 function Index() {
 	const [showCustomer, setShowCustomer] = useState(false);
 	const [customer, setCustomer] = useState({});
+	const [customerTransactions, setCustomerTransactions] = useState({});
 	const [customerList, setCustomerList] = useState([]);
 	const [tableLoading, setTableLoading] = useState(true);
 	const [transactionLoading, setTransactionLoading] = useState(true);
@@ -62,53 +63,14 @@ function Index() {
 	 * Set customer transaction values by customer ID
 	 * @param {*} id 
 	 */
-	const getCustomer = async (id) => {
+	const getCustomer = useCallback(async (customerID) => {
 		setTransactionLoading(true);
 		setShowCustomer(true);
-		const customerTransaction = await getCustomerTransaction(id);
-		setCustomer(customerTransaction);
+		const { customer, customerTransactions } = await getCustomerTransaction(customerList, customerID);
+		setCustomer(customer);
+		setCustomerTransactions(customerTransactions);
 		setTransactionLoading(false);
-	}
-
-	/**
-	 * Get cutomer data from API by custoemr ID
-	 * @param {*} id 
-	 * @returns 
-	 */
-	const getCustomerTransaction = (id) => {
-		const customer = customerList.find(item => item.id === id);
-
-		return new Promise(function (resolve, reject) {
-			setTimeout(() => {
-
-				const { transactions, totalReward } = getRewards(TransactionList);
-
-				// sort as per month
-				const updatedTransaction = [];
-				let totalAmount = 0;
-				transactions.map(item => {
-					const dateArray = item.date.split('/');
-					const dateData = new Date(dateArray[2], dateArray[1], dateArray[0]);
-
-					let month = Months[dateData.getMonth()];
-					if (!updatedTransaction[month]) {
-						updatedTransaction[month] = [];
-					}
-					updatedTransaction[month].push(item);
-					totalAmount += item.amount;
-					return item;
-				})
-
-				console.log("updatedTransaction >", updatedTransaction)
-				resolve({
-					...customer,
-					totalRewardPoints: totalReward,
-					totalAmount: totalAmount,
-					transactions: updatedTransaction
-				});
-			}, 1000);
-		});
-	}
+	}, [customerList])
 
 	return (
 		<Box style={{ p: 4, }}>
@@ -124,6 +86,7 @@ function Index() {
 					<Transaction
 						title={`Transaction History`}
 						customer={customer}
+						customerTransactions={customerTransactions}
 						loading={transactionLoading}
 						handleClose={(state) => setShowCustomer(state)} />}
 			</Grid>

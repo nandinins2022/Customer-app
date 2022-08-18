@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {
 	Paper,
@@ -14,8 +15,10 @@ import {
 	Box
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import TransactionRows from './TransactionRows';
+import TransactionTotal from './TransactionTotal';
 
-import { getFullName } from './helper';
+import { getFullName } from '../service/helper';
 
 const style = {
 	position: 'absolute',
@@ -30,9 +33,18 @@ const style = {
 	overflow: 'hidden'
 };
 
+Transaction.propTypes = {
+	customerTransactions: PropTypes.object,
+	customer: PropTypes.object,
+	handleClose: PropTypes.func,
+	title: PropTypes.string,
+	loading: PropTypes.bool,
+}
+
 export default function Transaction(props) {
-	const { loading, title, customer, handleClose } = props;
-	const { first_name, last_name, email, transactions, totalRewardPoints, totalAmount } = customer;
+	const { loading, title, customer, handleClose, customerTransactions } = props;
+	const { first_name, last_name, email } = customer;
+	const { totalRewardPoints, totalAmount, transactions } = customerTransactions;
 
 	return (
 		<Modal
@@ -69,23 +81,19 @@ export default function Transaction(props) {
 
 								<TableBody>
 									{Object.keys(transactions).map(month =>
-										<TableRows month={month} data={transactions[month]} />
+										<TransactionRows key={month} month={month} data={transactions[month]} />
 									)}
 									<TableRow>
-										<TableCell colSpan={4}>
-											<strong>Total Amount in $</strong>
-										</TableCell>
-										<TableCell>
-											<strong>{totalAmount.toFixed(2)}{'$'}</strong>
-										</TableCell>
+										<TransactionTotal
+											colSpan={4}
+											title={`Total Amount in $`}
+											amounts={[totalAmount]} />
 									</TableRow>
 									<TableRow>
-										<TableCell colSpan={4}>
-											<strong>Total Rewards Points in $</strong>
-										</TableCell>
-										<TableCell>
-											<strong>{totalRewardPoints.toFixed(2)}{'$'}</strong>
-										</TableCell>
+										<TransactionTotal
+											colSpan={4}
+											title={`Total Rewards Points in $`}
+											amounts={[totalRewardPoints]} />
 									</TableRow>
 								</TableBody>
 							</Table>
@@ -97,35 +105,4 @@ export default function Transaction(props) {
 	);
 }
 
-const TableRows = (props) => {
-	const { month, data } = props;
 
-	return (
-		<>
-			<TableRow key={month} >
-				<TableCell colSpan={5}><strong style={{ color: '#808080' }}>{month}</strong></TableCell>
-			</TableRow>
-
-			{data.map(item => (
-				<TableRow key={item.id} style={{ color: '#808080' }}>
-					<TableCell>{item.id}</TableCell>
-					<TableCell>{item.type}</TableCell>
-					<TableCell>{item.date}</TableCell>
-					<TableCell>{item.amount.toFixed(2)}$</TableCell>
-					<TableCell>{item.reward.toFixed(2)}$</TableCell>
-				</TableRow>
-			))}
-			<TableRow>
-				<TableCell colSpan={3}>
-					<strong style={{ color: '#808080' }}>Total of {month}</strong>
-				</TableCell>
-				<TableCell>
-					<strong style={{ color: '#808080' }}>{data.map(item => item.amount).reduce((total, amount) => total + amount).toFixed(2)}{'$'}</strong>
-				</TableCell>
-				<TableCell>
-					<strong style={{ color: '#808080' }}>{data.map(item => item.reward).reduce((total, amount) => total + amount).toFixed(2)}{'$'}</strong>
-				</TableCell>
-			</TableRow>
-		</>
-	)
-}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 
 import {
@@ -27,7 +27,7 @@ List.propTypes = {
   handleClick: PropTypes.func
 }
 
-export default function List(props) {
+function List(props) {
   const { title, data, loading, handleClick } = props;
 
   return (
@@ -79,3 +79,5 @@ export default function List(props) {
     </>
   );
 }
+
+export default memo(List)

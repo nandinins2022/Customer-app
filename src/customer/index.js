@@ -41,25 +41,6 @@ function Index() {
 	}
 
 	/**
-	 * Handle caolumn click
-	 * @param {*} column 
-	 * @param {*} data 
-	 */
-	const handleClick = (column, data) => {
-		switch (column) {
-			case "name":
-				getCustomer(data);
-				break;
-			case "view":
-				getCustomer(data);
-				break;
-			default:
-				// Do nothing for other columns
-				break;
-		}
-	}
-
-	/**
 	 * Set customer transaction values by customer ID
 	 * @param {*} id 
 	 */
@@ -71,6 +52,25 @@ function Index() {
 		setCustomerTransactions(customerTransactions);
 		setTransactionLoading(false);
 	}, [customerList])
+
+	/**
+	 * Handle caolumn click
+	 * @param {*} column 
+	 * @param {*} data 
+	 */
+	const handleClick = useCallback((column, data) => {
+		switch (column) {
+			case "name":
+				getCustomer(data);
+				break;
+			case "view":
+				getCustomer(data);
+				break;
+			default:
+				// Do nothing for other columns
+				break;
+		}
+	}, [getCustomer])
 
 	return (
 		<Box style={{ p: 4, }}>
